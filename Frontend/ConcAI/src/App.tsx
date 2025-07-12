@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
+import { Canvas } from '@react-three/fiber';
+import { Sky, Stats } from '@react-three/drei';
 import StepNavigator from './components/StepNavigator';
 import UrlInput from './components/UrlInput';
 import SeatSelection from './components/SeatSelection';
-import Coollesium from './Screen/coollesıum';
+import Scene from './components/Scene';
+import { CinemaUI } from './components/CinemaUI';
+import CinemaSeatSelector from './components/CinemaSeatSelector';
 import './App.css';
 
 interface Step {
@@ -21,9 +25,65 @@ interface Seat {
   isVip?: boolean;
 }
 
+interface CinemaSeat {
+  id: number;
+  row: number;
+  seatNumber: number;
+  position: { x: number; y: number; z: number };
+  rotation: number;
+  isSelected: boolean;
+}
+
+// Helper function to create amphitheater seating
+const createAmphitheaterSeating = (): CinemaSeat[] => {
+  const seats: CinemaSeat[] = []
+  const centerPoint = { x: 0, y: 0, z: -12 }
+  const seatsPerRow = [6, 9, 12, 15, 18]
+  const baseRadius = 8
+  const radiusIncrement = 2.5
+  
+  let seatIdCounter = 1
+  
+  seatsPerRow.forEach((seatCount, rowIndex) => {
+    const radius = baseRadius + (rowIndex * radiusIncrement)
+    const angleRange = Math.PI * 0.85
+    const angleStart = -angleRange / 2
+    const angleStep = angleRange / (seatCount - 1)
+    
+    for (let i = 0; i < seatCount; i++) {
+      const angle = angleStart + (i * angleStep)
+      const x = centerPoint.x + Math.sin(angle) * radius
+      const z = centerPoint.z + Math.cos(angle) * radius
+      const y = 0.1 + (rowIndex * 0.32)
+      
+      const seatRotation = Math.atan2(centerPoint.x - x, centerPoint.z - z)
+      
+      seats.push({
+        id: seatIdCounter++,
+        row: rowIndex + 1,
+        seatNumber: i + 1,
+        position: { x, y, z },
+        rotation: seatRotation,
+        isSelected: false
+      })
+    }
+  })
+  
+  return seats
+}
+
 function App() {
   const [currentStep, setCurrentStep] = useState(1);
   const [videoUrl, setVideoUrl] = useState('');
+  const [showCinemaSeatSelector, setShowCinemaSeatSelector] = useState(false);
+  
+  // 3D sinema için koltuklar
+  const cinemaSeats = createAmphitheaterSeating();
+  const [currentViewerSeat, setCurrentViewerSeat] = useState(() => {
+    // 3. sıra (12 koltuklu sıra), ortadaki koltuk (6. veya 7. koltuk) - varsayılan
+    return cinemaSeats.find(seat => seat.row === 3 && seat.seatNumber === 6) || cinemaSeats[17]
+  });
+  
   const [seats, setSeats] = useState<Seat[]>(() => {
     // Örnek koltuk düzeni oluştur
     const seatData: Seat[] = [];
@@ -100,16 +160,60 @@ function App() {
     setCurrentStep(4);
   };
 
+  // 3D Sinema koltuk seçim fonksiyonu
+  const handleCinemaSeatSelect = (selectedSeat: CinemaSeat) => {
+    setCurrentViewerSeat(selectedSeat);
+    setShowCinemaSeatSelector(false);
+  };
+
+  // S tuşu ile seçim ekranını açma
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.code === 'KeyS' && currentStep === 4 && !showCinemaSeatSelector) {
+        setShowCinemaSeatSelector(true);
+      }
+    };
+    
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [showCinemaSeatSelector, currentStep]);
+
   const selectedSeats = seats.filter(seat => seat.isSelected);
 
-  // Eğer 4. adımda isek, Coollesium sinema salonu göster
+  // Eğer 4. adımda isek, 3D Sinema salonu göster
   if (currentStep === 4) {
     return (
-      <Coollesium 
-        isActive={true} 
-        videoUrl={videoUrl}
-        selectedSeats={selectedSeats}
-      />
+      <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
+        {/* Sandalye Seçim Ekranı - Canvas dışında render et */}
+        {showCinemaSeatSelector && (
+          <CinemaSeatSelector 
+            seats={cinemaSeats}
+            onSeatSelect={handleCinemaSeatSelect}
+            onClose={() => setShowCinemaSeatSelector(false)}
+          />
+        )}
+
+        <Canvas
+          camera={{
+            position: [0, 3, 18],
+            fov: 75,
+            near: 0.1,
+            far: 1000
+          }}
+          style={{ background: '#87CEEB' }}
+          shadows
+        >
+          <Suspense fallback={null}>
+            <Scene 
+              seats={cinemaSeats}
+              currentViewerSeat={currentViewerSeat}
+            />
+            <Sky sunPosition={[100, 20, 100]} />
+            <Stats />
+          </Suspense>
+        </Canvas>
+        <CinemaUI />
+      </div>
     );
   }
 

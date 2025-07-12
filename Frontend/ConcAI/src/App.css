@@ -497,6 +497,52 @@ body {
   box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
 }
 
+/* 3D Cinema UI Styles */
+.ui-overlay {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: white;
+  z-index: 1000;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.crosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  z-index: 1001;
+}
+
+.crosshair::before,
+.crosshair::after {
+  content: '';
+  position: absolute;
+  background: white;
+}
+
+.crosshair::before {
+  width: 2px;
+  height: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.crosshair::after {
+  width: 20px;
+  height: 2px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
 /* Responsive Tasarım */
 @media (max-width: 768px) {
   .app-header h1 {
