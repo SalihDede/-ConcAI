@@ -3,7 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { Sky, Stats } from '@react-three/drei';
 import StepNavigator from './components/StepNavigator';
 import UrlInput from './components/UrlInput';
-import SeatSelection from './components/SeatSelection';
+
 import Scene from './components/Scene';
 import { CinemaUI } from './components/CinemaUI';
 import CinemaSeatSelector from './components/CinemaSeatSelector';
@@ -16,14 +16,7 @@ interface Step {
   isActive: boolean;
 }
 
-interface Seat {
-  id: string;
-  row: number;
-  number: number;
-  isAvailable: boolean;
-  isSelected: boolean;
-  isVip?: boolean;
-}
+
 
 interface CinemaSeat {
   id: number;
@@ -84,23 +77,7 @@ function App() {
     return cinemaSeats.find(seat => seat.row === 3 && seat.seatNumber === 6) || cinemaSeats[17]
   });
   
-  const [seats, setSeats] = useState<Seat[]>(() => {
-    // Örnek koltuk düzeni oluştur
-    const seatData: Seat[] = [];
-    for (let row = 1; row <= 8; row++) {
-      for (let seatNum = 1; seatNum <= 12; seatNum++) {
-        seatData.push({
-          id: `${row}-${seatNum}`,
-          row,
-          number: seatNum,
-          isAvailable: Math.random() > 0.3, // %70 müsait
-          isSelected: false,
-          isVip: row >= 6 // Son 3 sıra VIP
-        });
-      }
-    }
-    return seatData;
-  });
+
 
   const steps: Step[] = [
     {
@@ -134,21 +111,9 @@ function App() {
     setCurrentStep(2);
   };
 
-  const handleSeatSelect = (seatId: string) => {
-    setSeats(prevSeats => 
-      prevSeats.map(seat => 
-        seat.id === seatId 
-          ? { ...seat, isSelected: !seat.isSelected }
-          : seat
-      )
-    );
-  };
 
-  const handleNextStep = () => {
-    if (currentStep < 4) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
+
+
 
   const handlePrevStep = () => {
     if (currentStep > 1) {
@@ -180,7 +145,7 @@ function App() {
     return () => document.removeEventListener('keydown', handleKeyPress);
   }, [showCinemaSeatSelector, currentStep]);
 
-  const selectedSeats = seats.filter(seat => seat.isSelected);
+
 
   // Eğer 4. adımda isek, 3D Sinema salonu göster
   if (currentStep === 4) {
@@ -233,33 +198,27 @@ function App() {
         )}
 
         {currentStep === 2 && (
-          <div className="seat-selection-container">
-            <div className="step-header">
-              <h2>Koltuk Seçimi</h2>
-              <p>Video: {videoUrl}</p>
-            </div>
-            <SeatSelection 
-              seats={seats} 
-              onSeatSelect={handleSeatSelect}
-              maxSeats={6}
-            />
-          </div>
+          <CinemaSeatSelector
+            seats={cinemaSeats}
+            onSeatSelect={(seat) => {
+              setCurrentViewerSeat(seat);
+              setCurrentStep(3);
+            }}
+            onClose={() => setCurrentStep(1)}
+          />
         )}
 
         {currentStep === 3 && (
           <div className="confirmation-container">
             <h2>Rezervasyon Onayı</h2>
             <div className="booking-summary">
-              <h3>Seçili Koltuklar</h3>
+              <h3>Seçili Koltuk</h3>
               <div className="selected-seats">
-                {selectedSeats.map(seat => (
-                  <span key={seat.id} className="seat-tag">
-                    {String.fromCharCode(64 + seat.row)}{seat.number}
-                  </span>
-                ))}
+                <span className="seat-tag">
+                  {currentViewerSeat.row}-{currentViewerSeat.seatNumber}
+                </span>
               </div>
               <p><strong>Video:</strong> {videoUrl}</p>
-              <p><strong>Toplam:</strong> {selectedSeats.length} koltuk</p>
             </div>
           </div>
         )}
@@ -272,11 +231,7 @@ function App() {
               Geri
             </button>
           )}
-          {currentStep === 2 && selectedSeats.length > 0 && (
-            <button onClick={handleNextStep} className="nav-button next">
-              Devam Et
-            </button>
-          )}
+
           {currentStep === 3 && (
             <button onClick={handleConfirmReservation} className="nav-button confirm">
               Rezervasyonu Onayla
