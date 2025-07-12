@@ -1,4 +1,5 @@
 import HeadController from './HeadController'
+import { Html } from '@react-three/drei'
 
 // Seat interface
 interface Seat {
@@ -14,6 +15,7 @@ interface Seat {
 interface SceneProps {
   seats: Seat[]
   currentViewerSeat: Seat
+  videoUrl: string // YouTube URL'sini ekliyoruz
 }
 
 // Sinema koltuğu bileşeni
@@ -74,24 +76,58 @@ const Stage = () => {
   )
 }
 
-// Beyaz projeksiyon perdesi
-const ProjectionScreen = () => {
+// Video oynatma ekranı
+const ProjectionScreenWithVideo = ({ videoUrl }: { videoUrl: string }) => {
+  const getEmbedUrl = (url: string) => {
+    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+    if (videoId) {
+      return `https://www.youtube.com/embed/${videoId[1]}?autoplay=1&controls=1`;
+    }
+    return url;
+  };
+
   return (
-    <group position={[0, 4, -11.8]}>
+    <group position={[0, 4.5, -12]}>
       {/* Perde çerçevesi */}
       <mesh position={[0, 0, 0]} castShadow>
         <boxGeometry args={[12, 6, 0.1]} />
         <meshStandardMaterial color="#222222" />
       </mesh>
-      
+
       {/* Perde içi (ekran alanı) */}
       <mesh position={[0, 0, 0.01]}>
         <boxGeometry args={[11, 5.5, 0.05]} />
         <meshStandardMaterial color="#FFFFFF" emissive="#FFFFFF" emissiveIntensity={0.2} />
       </mesh>
+
+      {/* Video iframe */}
+      <Html
+        center
+        transform
+        position={[0, 0, 0.03]}
+        style={{
+          width: '440px',
+          height: '220px',
+          pointerEvents: 'none',
+        }}
+      >
+        <iframe
+          src={getEmbedUrl(videoUrl)}
+          width="440"
+          height="220"
+          frameBorder="0"
+          allowFullScreen
+          style={{
+            border: 'none',
+            borderRadius: '8px',
+            backgroundColor: 'black',
+            display: 'block',
+          }}
+        />
+      </Html>
     </group>
-  )
-}
+  );
+};
 
 // Zemin - daha doğal görünüm için
 const Floor = () => {
@@ -165,7 +201,7 @@ const ColosseumWalls = () => {
   return <>{walls}</>
 }
 
-const Scene = ({ seats, currentViewerSeat }: SceneProps) => {
+const Scene = ({ seats, currentViewerSeat, videoUrl }: SceneProps) => {
   return (
     <>
       {/* Ana sahne ışığı - parlaklık artırıldı */}
@@ -209,7 +245,9 @@ const Scene = ({ seats, currentViewerSeat }: SceneProps) => {
       <AmphitheaterSteps />
       <ColosseumWalls />
       <Stage />
-      <ProjectionScreen />
+
+      {/* Video oynatma ekranı */}
+      <ProjectionScreenWithVideo videoUrl={videoUrl} />
 
       {/* Amfi tiyatro koltukları */}
       {seats.map((seat, index) => {

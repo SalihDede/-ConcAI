@@ -207,6 +207,7 @@ function App() {
             <Scene 
               seats={cinemaSeats}
               currentViewerSeat={currentViewerSeat}
+              videoUrl={videoUrl}  // YouTube URL'sini Scene bileşenine geçiriyoruz
             />
             <Sky sunPosition={[100, 20, 100]} />
             <Stats />
