@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import StepNavigator from './components/StepNavigator';
 import UrlInput from './components/UrlInput';
 import SeatSelection from './components/SeatSelection';
+import Screen from './Screen/screen';
 import './App.css';
 
 interface Step {
@@ -56,9 +57,15 @@ function App() {
     },
     {
       id: 3,
-      title: 'Onay',
-      isCompleted: false,
+      title: 'Rezervasyon',
+      isCompleted: currentStep > 3,
       isActive: currentStep === 3
+    },
+    {
+      id: 4,
+      title: 'Sinema',
+      isCompleted: false,
+      isActive: currentStep === 4
     }
   ];
 
@@ -78,7 +85,7 @@ function App() {
   };
 
   const handleNextStep = () => {
-    if (currentStep < 3) {
+    if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -89,7 +96,28 @@ function App() {
     }
   };
 
+  const handleConfirmReservation = () => {
+    setCurrentStep(4);
+  };
+
+  const handleBackToHome = () => {
+    setCurrentStep(1);
+    setVideoUrl('');
+    setSeats(prevSeats => prevSeats.map(seat => ({ ...seat, isSelected: false })));
+  };
+
   const selectedSeats = seats.filter(seat => seat.isSelected);
+
+  // Eğer 4. adımda isek, tam ekran sinema göster
+  if (currentStep === 4) {
+    return (
+      <Screen 
+        videoUrl={videoUrl} 
+        selectedSeats={selectedSeats}
+        onBack={handleBackToHome}
+      />
+    );
+  }
 
   return (
     <div className="app">
@@ -121,8 +149,7 @@ function App() {
           <div className="confirmation-container">
             <h2>Rezervasyon Onayı</h2>
             <div className="booking-summary">
-              <p><strong>Video URL:</strong> {videoUrl}</p>
-              <p><strong>Seçili Koltuklar:</strong></p>
+              <h3>Seçili Koltuklar</h3>
               <div className="selected-seats">
                 {selectedSeats.map(seat => (
                   <span key={seat.id} className="seat-tag">
@@ -130,6 +157,7 @@ function App() {
                   </span>
                 ))}
               </div>
+              <p><strong>Video:</strong> {videoUrl}</p>
               <p><strong>Toplam:</strong> {selectedSeats.length} koltuk</p>
             </div>
           </div>
@@ -149,7 +177,7 @@ function App() {
             </button>
           )}
           {currentStep === 3 && (
-            <button className="nav-button confirm">
+            <button onClick={handleConfirmReservation} className="nav-button confirm">
               Rezervasyonu Onayla
             </button>
           )}
