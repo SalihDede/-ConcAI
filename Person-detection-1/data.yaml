@@ -1,0 +1,12 @@
+names:
+- Persona
+nc: 1
+roboflow:
+  license: CC BY 4.0
+  project: person-detection-9a6mk-3cuox
+  url: https://universe.roboflow.com/ai-researcher-wannabe/person-detection-9a6mk-3cuox/dataset/1
+  version: 1
+  workspace: ai-researcher-wannabe
+test: ../test/images
+train: ../train/images
+val: ../valid/images
