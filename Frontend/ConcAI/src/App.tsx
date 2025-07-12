@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import StepNavigator from './components/StepNavigator';
 import UrlInput from './components/UrlInput';
 import SeatSelection from './components/SeatSelection';
-import Screen from './Screen/screen';
+import Coollesium from './Screen/coollesıum';
 import './App.css';
 
 interface Step {
@@ -100,21 +100,15 @@ function App() {
     setCurrentStep(4);
   };
 
-  const handleBackToHome = () => {
-    setCurrentStep(1);
-    setVideoUrl('');
-    setSeats(prevSeats => prevSeats.map(seat => ({ ...seat, isSelected: false })));
-  };
-
   const selectedSeats = seats.filter(seat => seat.isSelected);
 
-  // Eğer 4. adımda isek, tam ekran sinema göster
+  // Eğer 4. adımda isek, Coollesium sinema salonu göster
   if (currentStep === 4) {
     return (
-      <Screen 
-        videoUrl={videoUrl} 
+      <Coollesium 
+        isActive={true} 
+        videoUrl={videoUrl}
         selectedSeats={selectedSeats}
-        onBack={handleBackToHome}
       />
     );
   }
