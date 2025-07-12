@@ -166,14 +166,16 @@ function App() {
     setShowCinemaSeatSelector(false);
   };
 
-  // S tuşu ile seçim ekranını açma
+  // S tuşu ile seçim ekranını açma ve Q/Escape ile ana menüye dönme
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.code === 'KeyS' && currentStep === 4 && !showCinemaSeatSelector) {
         setShowCinemaSeatSelector(true);
       }
+      if ((event.code === 'KeyQ' || event.code === 'Escape') && currentStep === 4) {
+        setCurrentStep(1);
+      }
     };
-    
     document.addEventListener('keydown', handleKeyPress);
     return () => document.removeEventListener('keydown', handleKeyPress);
   }, [showCinemaSeatSelector, currentStep]);
