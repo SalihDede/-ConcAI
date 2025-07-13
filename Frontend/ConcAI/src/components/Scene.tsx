@@ -17,6 +17,7 @@ interface SceneProps {
   currentViewerSeat: Seat
   videoUrl: string // Bu artık lokal video URL'si olacak
   videoTitle?: string
+  isSeatSelectorOpen?: boolean
 }
 
 // Sinema koltuğu bileşeni
@@ -80,40 +81,44 @@ const Stage = () => {
 // Video oynatma ekranı
 import { useRef, useEffect } from 'react'
 
-const ProjectionScreenWithVideo = ({ videoUrl, videoTitle, viewerPosition, viewerRotationY }: { videoUrl: string; videoTitle?: string; viewerPosition: [number, number, number]; viewerRotationY: number }) => {
+
+const ProjectionScreenWithVideo = ({ videoUrl, videoTitle, viewerPosition, viewerRotationY, isSeatSelectorOpen }: { videoUrl: string; videoTitle?: string; viewerPosition: [number, number, number]; viewerRotationY: number; isSeatSelectorOpen: boolean }) => {
   const isLocalVideo = videoUrl.startsWith('http://localhost:5000/api/video/stream/');
   const isYouTubeUrl = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be');
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Ses seviyesini mesafe ve açıya göre ayarla
-  useEffect(() => {
+  const updateVolume = () => {
     if (!videoRef.current) return;
-    // Sahne merkezi (perde) noktası
+    if (isSeatSelectorOpen) {
+      videoRef.current.volume = 0.2; // Menü açıkken sabit düşük ses
+      return;
+    }
     const screenPos = { x: 0, y: 4.5, z: -12 };
     const [vx, , vz] = viewerPosition;
-    // Mesafe (daha uzaksa ses azalır)
     const distance = Math.sqrt((vx - screenPos.x) ** 2 + (vz - screenPos.z) ** 2);
-    // 6 birimden yakınsa tam ses, 20 birimden uzaktaysa minimum ses
     const minDist = 6, maxDist = 20;
     let distanceVolume = 1 - (distance - minDist) / (maxDist - minDist);
     distanceVolume = Math.max(0.15, Math.min(1, distanceVolume));
-
-    // Kullanıcı bakış açısı ile perde arasındaki açı farkı (daha çok bakıyorsa ses yüksek)
-    // Kullanıcıdan perdeye vektör
     const dx = screenPos.x - vx;
     const dz = screenPos.z - vz;
-    const targetAngle = Math.atan2(dx, dz); // Sahneye bakış açısı
+    const targetAngle = Math.atan2(dx, dz);
     let angleDiff = Math.abs(viewerRotationY - targetAngle);
-    // Açıyı [0, pi] aralığına çek
     angleDiff = Math.min(angleDiff, Math.abs(2 * Math.PI - angleDiff));
-    // 0 rad (doğrudan bakıyor) ise tam ses, pi/2 ve üstü ise düşük ses
-    let angleVolume = 1 - angleDiff / (Math.PI / 1.2); // 0~1 arası
+    let angleVolume = 1 - angleDiff / (Math.PI / 1.2);
     angleVolume = Math.max(0.15, Math.min(1, angleVolume));
-
-    // Son ses: mesafe ve açı çarpımı
     const finalVolume = distanceVolume * angleVolume;
     videoRef.current.volume = finalVolume;
-  }, [viewerPosition, viewerRotationY, videoUrl]);
+  };
+
+  useEffect(() => {
+    updateVolume();
+  }, [viewerPosition, viewerRotationY, isSeatSelectorOpen]);
+
+  // Video yüklendiğinde de sesi ayarla
+  const handleLoadedMetadata = () => {
+    updateVolume();
+  };
 
   const getEmbedUrl = (url: string) => {
     if (isYouTubeUrl) {
@@ -159,6 +164,7 @@ const ProjectionScreenWithVideo = ({ videoUrl, videoTitle, viewerPosition, viewe
             height="220"
             controls
             autoPlay
+            onLoadedMetadata={handleLoadedMetadata}
             style={{
               border: 'none',
               borderRadius: '8px',
@@ -289,10 +295,8 @@ const ColosseumWalls = () => {
 }
 
 import { useThree } from '@react-three/fiber'
-const Scene = ({ seats, currentViewerSeat, videoUrl, videoTitle }: SceneProps) => {
-  // Kamera yönünü almak için useThree
+const Scene = ({ seats, currentViewerSeat, videoUrl, videoTitle, isSeatSelectorOpen }: SceneProps) => {
   const { camera } = useThree();
-  // Kamera yönü (Y ekseni, yani yatay bakış açısı)
   const viewerRotationY = camera.rotation.y;
   const viewerPosition: [number, number, number] = [currentViewerSeat.position.x, currentViewerSeat.position.y + 1.5, currentViewerSeat.position.z];
   return (
@@ -340,7 +344,7 @@ const Scene = ({ seats, currentViewerSeat, videoUrl, videoTitle }: SceneProps) =
       <Stage />
 
       {/* Video oynatma ekranı */}
-      <ProjectionScreenWithVideo videoUrl={videoUrl} videoTitle={videoTitle} viewerPosition={viewerPosition} viewerRotationY={viewerRotationY} />
+      <ProjectionScreenWithVideo videoUrl={videoUrl} videoTitle={videoTitle} viewerPosition={viewerPosition} viewerRotationY={viewerRotationY} isSeatSelectorOpen={!!isSeatSelectorOpen} />
 
       {/* Amfi tiyatro koltukları */}
       {seats.map((seat, index) => {
