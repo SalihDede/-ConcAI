@@ -61,7 +61,7 @@ python enhanced_video_server.py
 
 4. **Install Frontend dependencies**
 ```bash
-cd Frontend/The_Party
+cd Frontend/ConcAI
 npm install
 ```
 
