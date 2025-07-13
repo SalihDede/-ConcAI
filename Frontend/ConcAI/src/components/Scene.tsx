@@ -15,7 +15,8 @@ interface Seat {
 interface SceneProps {
   seats: Seat[]
   currentViewerSeat: Seat
-  videoUrl: string // YouTube URL'sini ekliyoruz
+  videoUrl: string // Bu artık lokal video URL'si olacak
+  videoTitle?: string
 }
 
 // Sinema koltuğu bileşeni
@@ -77,11 +78,16 @@ const Stage = () => {
 }
 
 // Video oynatma ekranı
-const ProjectionScreenWithVideo = ({ videoUrl }: { videoUrl: string }) => {
+const ProjectionScreenWithVideo = ({ videoUrl, videoTitle }: { videoUrl: string; videoTitle?: string }) => {
+  const isLocalVideo = videoUrl.startsWith('http://localhost:5000/api/video/stream/');
+  const isYouTubeUrl = videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be');
+  
   const getEmbedUrl = (url: string) => {
-    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
-    if (videoId) {
-      return `https://www.youtube.com/embed/${videoId[1]}?autoplay=1&controls=1`;
+    if (isYouTubeUrl) {
+      const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/);
+      if (videoId) {
+        return `https://www.youtube.com/embed/${videoId[1]}?autoplay=1&controls=1`;
+      }
     }
     return url;
   };
@@ -100,7 +106,7 @@ const ProjectionScreenWithVideo = ({ videoUrl }: { videoUrl: string }) => {
         <meshStandardMaterial color="#FFFFFF" emissive="#FFFFFF" emissiveIntensity={0.2} />
       </mesh>
 
-      {/* Video iframe */}
+      {/* Video oynatıcı */}
       <Html
         center
         transform
@@ -108,23 +114,70 @@ const ProjectionScreenWithVideo = ({ videoUrl }: { videoUrl: string }) => {
         style={{
           width: '440px',
           height: '220px',
-          pointerEvents: 'none',
+          pointerEvents: 'all',
         }}
       >
-        <iframe
-          src={getEmbedUrl(videoUrl)}
-          width="440"
-          height="220"
-          frameBorder="0"
-          allowFullScreen
-          style={{
-            border: 'none',
-            borderRadius: '8px',
-            backgroundColor: 'black',
-            display: 'block',
-          }}
-        />
+        {isLocalVideo ? (
+          // Lokal video dosyası için HTML5 video element
+          <video
+            src={videoUrl}
+            width="440"
+            height="220"
+            controls
+            autoPlay
+            style={{
+              border: 'none',
+              borderRadius: '8px',
+              backgroundColor: 'black',
+              display: 'block',
+            }}
+          />
+        ) : (
+          // YouTube veya diğer embed videolar için iframe
+          <iframe
+            src={getEmbedUrl(videoUrl)}
+            width="440"
+            height="220"
+            frameBorder="0"
+            allowFullScreen
+            style={{
+              border: 'none',
+              borderRadius: '8px',
+              backgroundColor: 'black',
+              display: 'block',
+            }}
+          />
+        )}
       </Html>
+
+      {/* Video başlık plakası */}
+      {videoTitle && (
+        <Html
+          center
+          transform
+          position={[0, -3.5, 0.03]}
+          style={{
+            width: '400px',
+            textAlign: 'center',
+            pointerEvents: 'none',
+          }}
+        >
+          <div style={{
+            background: 'rgba(0, 0, 0, 0.8)',
+            color: 'white',
+            padding: '10px',
+            borderRadius: '5px',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            maxWidth: '400px',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
+            {videoTitle}
+          </div>
+        </Html>
+      )}
     </group>
   );
 };
@@ -201,7 +254,7 @@ const ColosseumWalls = () => {
   return <>{walls}</>
 }
 
-const Scene = ({ seats, currentViewerSeat, videoUrl }: SceneProps) => {
+const Scene = ({ seats, currentViewerSeat, videoUrl, videoTitle }: SceneProps) => {
   return (
     <>
       {/* Ana sahne ışığı - parlaklık artırıldı */}
@@ -247,7 +300,7 @@ const Scene = ({ seats, currentViewerSeat, videoUrl }: SceneProps) => {
       <Stage />
 
       {/* Video oynatma ekranı */}
-      <ProjectionScreenWithVideo videoUrl={videoUrl} />
+      <ProjectionScreenWithVideo videoUrl={videoUrl} videoTitle={videoTitle} />
 
       {/* Amfi tiyatro koltukları */}
       {seats.map((seat, index) => {

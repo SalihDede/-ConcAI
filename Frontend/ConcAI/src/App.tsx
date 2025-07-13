@@ -16,8 +16,6 @@ interface Step {
   isActive: boolean;
 }
 
-
-
 interface CinemaSeat {
   id: number;
   row: number;
@@ -49,14 +47,12 @@ const createAmphitheaterSeating = (): CinemaSeat[] => {
       const z = centerPoint.z + Math.cos(angle) * radius
       const y = 0.1 + (rowIndex * 0.32)
       
-      const seatRotation = Math.atan2(centerPoint.x - x, centerPoint.z - z)
-      
       seats.push({
         id: seatIdCounter++,
         row: rowIndex + 1,
         seatNumber: i + 1,
         position: { x, y, z },
-        rotation: seatRotation,
+        rotation: -angle,
         isSelected: false
       })
     }
@@ -68,16 +64,15 @@ const createAmphitheaterSeating = (): CinemaSeat[] => {
 function App() {
   const [currentStep, setCurrentStep] = useState(1);
   const [videoUrl, setVideoUrl] = useState('');
+  const [videoTitle, setVideoTitle] = useState('');
   const [showCinemaSeatSelector, setShowCinemaSeatSelector] = useState(false);
   
-  // 3D sinema için koltuklar
+  // Amfi tiyatro koltukları
   const cinemaSeats = createAmphitheaterSeating();
   const [currentViewerSeat, setCurrentViewerSeat] = useState(() => {
     // 3. sıra (12 koltuklu sıra), ortadaki koltuk (6. veya 7. koltuk) - varsayılan
     return cinemaSeats.find(seat => seat.row === 3 && seat.seatNumber === 6) || cinemaSeats[17]
   });
-  
-
 
   const steps: Step[] = [
     {
@@ -107,13 +102,12 @@ function App() {
   ];
 
   const handleUrlSubmit = (url: string) => {
+    // URL'yi backend'e gönder ve indirme işlemini başlat
+    // İndirme tamamlandıktan sonra lokal video URL'sini al
     setVideoUrl(url);
+    setVideoTitle('Downloaded Video'); // Placeholder
     setCurrentStep(2);
   };
-
-
-
-
 
   const handlePrevStep = () => {
     if (currentStep > 1) {
@@ -145,8 +139,6 @@ function App() {
     return () => document.removeEventListener('keydown', handleKeyPress);
   }, [showCinemaSeatSelector, currentStep]);
 
-
-
   // Eğer 4. adımda isek, 3D Sinema salonu göster
   if (currentStep === 4) {
     return (
@@ -174,7 +166,8 @@ function App() {
             <Scene 
               seats={cinemaSeats}
               currentViewerSeat={currentViewerSeat}
-              videoUrl={videoUrl}  // YouTube URL'sini Scene bileşenine geçiriyoruz
+              videoUrl={videoUrl}
+              videoTitle={videoTitle}
             />
             <Sky sunPosition={[100, 20, 100]} />
             <Stats />
@@ -218,7 +211,7 @@ function App() {
                   {currentViewerSeat.row}-{currentViewerSeat.seatNumber}
                 </span>
               </div>
-              <p><strong>Video:</strong> {videoUrl}</p>
+              <p><strong>Video:</strong> {videoTitle || videoUrl}</p>
             </div>
           </div>
         )}

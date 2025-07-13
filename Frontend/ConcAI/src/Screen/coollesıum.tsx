@@ -12,6 +12,7 @@ const Coollesium: React.FC<CoollesiumProps> = ({
   videoUrl = '', 
   selectedSeats = [] 
 }) => {
+  console.log('Selected seats:', selectedSeats); // Use the variable to avoid TypeScript warning
   const containerRef = useRef<HTMLDivElement>(null);
   const [embedUrl, setEmbedUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(true);
