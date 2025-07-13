@@ -180,7 +180,7 @@ function App() {
   return (
     <div className="app">
       <div className="app-header">
-        <h1>ConcAI - Cinema Experience</h1>
+        <h1>The Party - Cinema Experience</h1>
         <StepNavigator steps={steps} currentStep={currentStep} />
       </div>
 

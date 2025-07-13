@@ -1,0 +1,26 @@
+# Backend Dependencies
+flask==2.3.3
+flask-cors==4.0.0
+flask-socketio==5.3.6
+python-socketio==5.8.0
+yt-dlp==2024.7.7
+requests==2.31.0
+
+# AI Model Dependencies
+torch>=2.0.0
+torchvision>=0.15.0
+ultralytics>=8.0.0
+opencv-python>=4.8.0
+numpy>=1.24.0
+roboflow>=1.1.0
+python-dotenv>=1.0.0
+pathlib2>=2.3.0
+
+# Optional GPU Support
+# torch-audio  # Uncomment if audio processing needed
+# cuda-toolkit  # Uncomment if CUDA support needed
+
+# Development Tools
+pytest>=7.0.0
+black>=23.0.0
+flake8>=6.0.0
