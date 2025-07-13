@@ -47,12 +47,16 @@ const createAmphitheaterSeating = (): CinemaSeat[] => {
       const z = centerPoint.z + Math.cos(angle) * radius
       const y = 0.1 + (rowIndex * 0.32)
       
+      // Koltuğun sahne merkezine bakacak şekilde rotasyonu hesaplanıyor
+      const dx = centerPoint.x - x;
+      const dz = centerPoint.z - z;
+      const rotation = Math.atan2(dx, dz);
       seats.push({
         id: seatIdCounter++,
         row: rowIndex + 1,
         seatNumber: i + 1,
         position: { x, y, z },
-        rotation: -angle,
+        rotation: rotation,
         isSelected: false
       })
     }
