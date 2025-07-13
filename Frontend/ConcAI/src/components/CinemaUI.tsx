@@ -8,6 +8,7 @@ export const CinemaUI = () => {
         <p>• Click: Enable mouse lock</p>
         <p>• ESC: Disable mouse lock</p>
         <p>• S key: Open seat selection screen</p>
+        <p>• V key: Hold to talk with other viewers</p>
         <br />
         <p><em>You are sitting in your selected seat.</em></p>
         <p><em>Explore the cinema hall and the environment!</em></p>

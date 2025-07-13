@@ -21,34 +21,28 @@ const HeadController = ({ viewerPosition = [0, 1.8, 0] }: { viewerPosition?: [nu
   const targetRotation = useRef({ x: 0, y: 0 })
   const currentRotation = useRef({ x: 0, y: 0 })
 
-  // Kamera pozisyonunu izleyicinin oturduğu koltuğa ayarla
+  // Kamera pozisyonunu izleyicinin oturduğu koltuğa ayarla (sadece ilk mount'ta çalışsın)
+  const initializedRef = useRef(false);
   useEffect(() => {
-    camera.position.set(viewerPosition[0], viewerPosition[1] + 1.5, viewerPosition[2])
-    
-    // Calculate viewing angle to stage center (initial rotation)
-    const stageCenter = new THREE.Vector3(0, 0, -12)
-    const cameraPosition = new THREE.Vector3(viewerPosition[0], viewerPosition[1] + 1.5, viewerPosition[2])
-    
-    // Calculate direction towards stage center
-    const direction = new THREE.Vector3().subVectors(stageCenter, cameraPosition).normalize()
-    
-    // Calculate Y-axis rotation (yaw) - looking towards stage center
-    const initialYaw = Math.atan2(direction.x, direction.z)
-    
-    // Calculate X-axis rotation (pitch) - slight downward look
-    const horizontalDistance = Math.sqrt(direction.x * direction.x + direction.z * direction.z)
-    const initialPitch = Math.atan2(-direction.y, horizontalDistance)
-    
-    // Set initial rotation to stage center (this will be the 0 point)
-    targetRotation.current = { x: initialPitch, y: initialYaw }
-    currentRotation.current = { x: initialPitch, y: initialYaw }
-    
-    // Immediately point camera to stage center
-    camera.rotation.order = 'YXZ'
-    camera.rotation.x = initialPitch
-    camera.rotation.y = initialYaw
-    camera.rotation.z = 0
-  }, [camera, viewerPosition])
+    camera.position.set(viewerPosition[0], viewerPosition[1] + 1.5, viewerPosition[2]);
+    // Sadece ilk mount'ta initial rotation ayarla
+    if (!initializedRef.current) {
+      const stageCenter = new THREE.Vector3(0, 0, -12);
+      const cameraPosition = new THREE.Vector3(viewerPosition[0], viewerPosition[1] + 1.5, viewerPosition[2]);
+      const direction = new THREE.Vector3().subVectors(stageCenter, cameraPosition).normalize();
+      let initialYaw = Math.atan2(direction.x, direction.z);
+      initialYaw += Math.PI; // 180 derece döndür
+      const horizontalDistance = Math.sqrt(direction.x * direction.x + direction.z * direction.z);
+      const initialPitch = Math.atan2(-direction.y, horizontalDistance);
+      targetRotation.current = { x: initialPitch, y: initialYaw };
+      currentRotation.current = { x: initialPitch, y: initialYaw };
+      camera.rotation.order = 'YXZ';
+      camera.rotation.x = initialPitch;
+      camera.rotation.y = initialYaw;
+      camera.rotation.z = 0;
+      initializedRef.current = true;
+    }
+  }, [camera, viewerPosition]);
 
   // Pointer lock event listeners
   useEffect(() => {
@@ -63,7 +57,6 @@ const HeadController = ({ viewerPosition = [0, 1.8, 0] }: { viewerPosition?: [nu
 
       // Calculate yaw (left-right turning) - constrained by limits starting from stage center
       targetRotation.current.y -= movementX * MOUSE_SENSITIVITY
-      
       // Clamp within wide angle range starting from stage center
       targetRotation.current.y = Math.max(
         HEAD_LIMITS.minYaw,
@@ -83,9 +76,12 @@ const HeadController = ({ viewerPosition = [0, 1.8, 0] }: { viewerPosition?: [nu
     }
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      // Only Escape key should exit pointer lock, no other key should affect camera
       if (event.code === 'Escape') {
-        document.exitPointerLock()
+        document.exitPointerLock();
       }
+      // Prevent any other key (including V) from affecting camera or pointer lock
+      // (No-op for all other keys)
     }
 
     // Event listener'ları ekle

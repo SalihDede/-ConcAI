@@ -3,6 +3,8 @@ import { Canvas } from '@react-three/fiber';
 import { Sky, Stats } from '@react-three/drei';
 import StepNavigator from './components/StepNavigator';
 import UrlInput from './components/UrlInput';
+import VoiceChat from './components/VoiceChat';
+import VoiceMeter from './components/VoiceMeter';
 
 import Scene from './components/Scene';
 import { CinemaUI } from './components/CinemaUI';
@@ -77,6 +79,9 @@ function App() {
     // 3rd row (12-seat row), middle seat (6th or 7th seat) - default
     return cinemaSeats.find(seat => seat.row === 3 && seat.seatNumber === 6) || cinemaSeats[17]
   });
+
+  const [audioLevel, setAudioLevel] = useState(0);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   const steps: Step[] = [
     {
@@ -178,6 +183,16 @@ function App() {
           </Suspense>
         </Canvas>
         <CinemaUI />
+        <VoiceChat 
+          isEnabled={true} 
+          currentSeat={currentViewerSeat}
+          setAudioLevel={setAudioLevel}
+          setIsSpeaking={setIsSpeaking}
+        />
+        <VoiceMeter
+          audioLevel={audioLevel}
+          isSpeaking={isSpeaking}
+        />
       </div>
     );
   }
