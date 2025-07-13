@@ -1,4 +1,4 @@
-# ConcAI - Immersive 3D Cinema Experience
+# The Party - Immersive 3D Cinema Experience
 
 🎬 **Advanced AI-powered 3D cinema platform with real-time voice chat and smart video processing**
 
@@ -44,8 +44,8 @@
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/SalihDede/-ConcAI.git
-cd -ConcAI
+git clone https://github.com/SalihDede/The_Party
+cd The_Party
 ```
 
 2. **Install Python dependencies**
@@ -61,7 +61,7 @@ python enhanced_video_server.py
 
 4. **Install Frontend dependencies**
 ```bash
-cd Frontend/ConcAI
+cd Frontend/The_Party
 npm install
 ```
 
@@ -86,7 +86,7 @@ npm run dev
 ## 📁 Project Structure
 
 ```
--ConcAI/
+The_Party/
 ├── Backend/
 │   └── FLASK/
 │       ├── enhanced_video_server.py  # Main backend server
@@ -186,13 +186,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **React Three Fiber** - For seamless React-Three.js integration
 - **yt-dlp Project** - For robust video downloading capabilities
 - **Ultralytics** - For state-of-the-art YOLO implementation
-
-## 📞 Support
-
-For questions and support:
-- Create an issue on GitHub
-- Check the [installation guide](KURULUM_KILAVUZU.md) for detailed setup instructions
-
----
-
-**Made with ❤️ for immersive web experiences**
