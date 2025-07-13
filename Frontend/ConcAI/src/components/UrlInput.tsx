@@ -24,6 +24,7 @@ const UrlInput: React.FC<UrlInputProps> = ({ onUrlSubmit, initialUrl = '' }) => 
   const [downloadId, setDownloadId] = useState<string | null>(null);
   const [downloadProgress, setDownloadProgress] = useState(0);
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'downloading' | 'completed' | 'failed'>('idle');
+  const [downloadedFilename, setDownloadedFilename] = useState<string | null>(null);
   const [socket, setSocket] = useState<any>(null);
 
   useEffect(() => {
@@ -42,7 +43,12 @@ const UrlInput: React.FC<UrlInputProps> = ({ onUrlSubmit, initialUrl = '' }) => 
         setDownloadStatus('completed');
         // Video indirme tamamlandıktan sonra 3D ortamına geç
         setTimeout(() => {
-          onUrlSubmit(url);
+          if (downloadedFilename) {
+            const localVideoUrl = `http://localhost:5000/api/video/stream/${downloadedFilename}`;
+            onUrlSubmit(localVideoUrl);
+          } else {
+            onUrlSubmit(url); // Fallback to original URL
+          }
         }, 1000);
       }
     });
@@ -115,6 +121,7 @@ const UrlInput: React.FC<UrlInputProps> = ({ onUrlSubmit, initialUrl = '' }) => 
       if (response.ok) {
         const data = await response.json();
         setDownloadId(data.download_id);
+        setDownloadedFilename(data.filename);
         setVideoInfo(data.video_info);
       } else {
         setDownloadStatus('failed');
