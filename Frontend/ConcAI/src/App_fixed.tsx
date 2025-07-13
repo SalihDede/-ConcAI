@@ -67,10 +67,10 @@ function App() {
   const [videoTitle, setVideoTitle] = useState('');
   const [showCinemaSeatSelector, setShowCinemaSeatSelector] = useState(false);
   
-  // Amfi tiyatro koltukları
+  // Amphitheater seats
   const cinemaSeats = createAmphitheaterSeating();
   const [currentViewerSeat, setCurrentViewerSeat] = useState(() => {
-    // 3. sıra (12 koltuklu sıra), ortadaki koltuk (6. veya 7. koltuk) - varsayılan
+    // 3rd row (12-seat row), middle seat (6th or 7th seat) - default
     return cinemaSeats.find(seat => seat.row === 3 && seat.seatNumber === 6) || cinemaSeats[17]
   });
 
@@ -83,27 +83,27 @@ function App() {
     },
     {
       id: 2,
-      title: 'Koltuk Seçimi',
+      title: 'Seat Selection',
       isCompleted: currentStep > 2,
       isActive: currentStep === 2
     },
     {
       id: 3,
-      title: 'Rezervasyon',
+      title: 'Reservation',
       isCompleted: currentStep > 3,
       isActive: currentStep === 3
     },
     {
       id: 4,
-      title: 'Sinema',
+      title: 'Cinema',
       isCompleted: false,
       isActive: currentStep === 4
     }
   ];
 
   const handleUrlSubmit = (url: string) => {
-    // URL'yi backend'e gönder ve indirme işlemini başlat
-    // İndirme tamamlandıktan sonra lokal video URL'sini al
+    // Send URL to backend and start download process
+    // Get local video URL after download completion
     setVideoUrl(url);
     setCurrentStep(2);
   };
@@ -118,13 +118,13 @@ function App() {
     setCurrentStep(4);
   };
 
-  // 3D Sinema koltuk seçim fonksiyonu
+  // 3D Cinema seat selection function
   const handleCinemaSeatSelect = (selectedSeat: CinemaSeat) => {
     setCurrentViewerSeat(selectedSeat);
     setShowCinemaSeatSelector(false);
   };
 
-  // S tuşu ile seçim ekranını açma ve Q/Escape ile ana menüye dönme
+  // S key to open selection screen and Q/Escape to return to main menu
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
       if (event.code === 'KeyS' && currentStep === 4 && !showCinemaSeatSelector) {
@@ -138,7 +138,7 @@ function App() {
     return () => document.removeEventListener('keydown', handleKeyPress);
   }, [showCinemaSeatSelector, currentStep]);
 
-  // Eğer 4. adımda isek, 3D Sinema salonu göster
+  // If on step 4, show 3D Cinema hall
   if (currentStep === 4) {
     return (
       <div style={{ width: '100vw', height: '100vh', position: 'relative' }}>
@@ -180,7 +180,7 @@ function App() {
   return (
     <div className="app">
       <div className="app-header">
-        <h1>ConcAI - Sinema Deneyimi</h1>
+        <h1>ConcAI - Cinema Experience</h1>
         <StepNavigator steps={steps} currentStep={currentStep} />
       </div>
 
@@ -202,9 +202,9 @@ function App() {
 
         {currentStep === 3 && (
           <div className="confirmation-container">
-            <h2>Rezervasyon Onayı</h2>
+            <h2>Reservation Confirmation</h2>
             <div className="booking-summary">
-              <h3>Seçili Koltuk</h3>
+              <h3>Selected Seat</h3>
               <div className="selected-seats">
                 <span className="seat-tag">
                   {currentViewerSeat.row}-{currentViewerSeat.seatNumber}
@@ -220,13 +220,13 @@ function App() {
         <div className="navigation-buttons">
           {currentStep > 1 && (
             <button onClick={handlePrevStep} className="nav-button prev">
-              Geri
+              Back
             </button>
           )}
 
           {currentStep === 3 && (
             <button onClick={handleConfirmReservation} className="nav-button confirm">
-              Rezervasyonu Onayla
+              Confirm Reservation
             </button>
           )}
         </div>

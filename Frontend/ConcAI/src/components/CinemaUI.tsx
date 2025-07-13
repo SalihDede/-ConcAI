@@ -2,15 +2,15 @@ export const CinemaUI = () => {
   return (
     <>
       <div className="ui-overlay">
-        <h3>🎭 ConcAI - 3D Sinema Salonu</h3>
-        <p><strong>Kontroller:</strong></p>
-        <p>• Fare hareketi: Kafa çevirme (doğal limitler dahilinde)</p>
-        <p>• Tıklama: Fare kilidini aktifleştir</p>
-        <p>• ESC: Fare kilidini kapat</p>
-        <p>• S tuşu: Koltuk seçim ekranını aç</p>
+        <h3>🎭 ConcAI - 3D Cinema Hall</h3>
+        <p><strong>Controls:</strong></p>
+        <p>• Mouse movement: Turn your head (within natural limits)</p>
+        <p>• Click: Enable mouse lock</p>
+        <p>• ESC: Disable mouse lock</p>
+        <p>• S key: Open seat selection screen</p>
         <br />
-        <p><em>Seçtiğiniz koltukta oturuyorsunuz.</em></p>
-        <p><em>Sinema salonunu ve çevreyi inceleyin!</em></p>
+        <p><em>You are sitting in your selected seat.</em></p>
+        <p><em>Explore the cinema hall and the environment!</em></p>
       </div>
       <div className="crosshair" />
     </>

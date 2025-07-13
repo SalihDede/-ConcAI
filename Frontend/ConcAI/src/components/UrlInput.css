@@ -110,24 +110,3 @@
   margin: 5px 0;
   color: #0c5460;
 }
-
-.url-examples {
-  margin-top: 20px;
-}
-
-.url-examples h3 {
-  color: #495057;
-}
-
-.url-examples ul {
-  list-style-type: none;
-  padding-left: 0;
-}
-
-.url-examples li {
-  background: #e9ecef;
-  padding: 8px 12px;
-  margin: 5px 0;
-  border-radius: 3px;
-  font-family: monospace;
-}

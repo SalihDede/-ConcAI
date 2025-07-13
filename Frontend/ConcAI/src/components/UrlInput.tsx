@@ -155,11 +155,11 @@ const UrlInput: React.FC<UrlInputProps> = ({ onUrlSubmit, initialUrl = '' }) => 
   const getProgressText = () => {
     switch (downloadStatus) {
       case 'downloading':
-        return `İndiriliyor... ${Math.round(downloadProgress * 100)}%`;
+        return `Downloading... ${Math.round(downloadProgress * 100)}%`;
       case 'completed':
-        return 'İndirme tamamlandı! 3D ortamına geçiliyor...';
+        return 'Download completed! Switching to 3D environment...';
       case 'failed':
-        return 'İndirme başarısız oldu. Tekrar deneyin.';
+        return 'Download failed. Please try again.';
       default:
         return '';
     }
@@ -167,7 +167,7 @@ const UrlInput: React.FC<UrlInputProps> = ({ onUrlSubmit, initialUrl = '' }) => 
 
   return (
     <div className="url-input-container">
-      <h2>YouTube Video URL'sini Girin</h2>
+      <h2>Enter YouTube Video URL</h2>
       <form onSubmit={handleSubmit} className="url-form">
         <div className="input-group">
           <input
@@ -183,12 +183,12 @@ const UrlInput: React.FC<UrlInputProps> = ({ onUrlSubmit, initialUrl = '' }) => 
             disabled={!isValidUrl || downloadStatus === 'downloading'}
             className="submit-button"
           >
-            {downloadStatus === 'downloading' ? 'İndiriliyor...' : 'İndir ve İzle'}
+            {downloadStatus === 'downloading' ? 'Downloading...' : 'Download and Watch'}
           </button>
         </div>
         
         {url && !isValidUrl && (
-          <p className="error-message">Lütfen geçerli bir YouTube URL'si girin</p>
+          <p className="error-message">Please enter a valid YouTube URL</p>
         )}
         
         {downloadStatus !== 'idle' && (
@@ -205,23 +205,15 @@ const UrlInput: React.FC<UrlInputProps> = ({ onUrlSubmit, initialUrl = '' }) => 
         
         {videoInfo && (
           <div className="video-info">
-            <h3>Video Bilgileri:</h3>
-            <p><strong>Başlık:</strong> {videoInfo.title}</p>
-            <p><strong>Kanal:</strong> {videoInfo.uploader}</p>
-            <p><strong>Süre:</strong> {Math.floor(videoInfo.duration / 60)}:{(videoInfo.duration % 60).toString().padStart(2, '0')}</p>
-            <p><strong>Görüntülenme:</strong> {videoInfo.view_count?.toLocaleString()} kez</p>
-            {videoInfo.description && <p><strong>Açıklama:</strong> {videoInfo.description}</p>}
+            <h3>Video Information:</h3>
+            <p><strong>Title:</strong> {videoInfo.title}</p>
+            <p><strong>Channel:</strong> {videoInfo.uploader}</p>
+            <p><strong>Duration:</strong> {Math.floor(videoInfo.duration / 60)}:{(videoInfo.duration % 60).toString().padStart(2, '0')}</p>
+            <p><strong>Views:</strong> {videoInfo.view_count?.toLocaleString()} times</p>
+            {videoInfo.description && <p><strong>Description:</strong> {videoInfo.description}</p>}
           </div>
         )}
       </form>
-      
-      <div className="url-examples">
-        <h3>Örnek URL Formatları:</h3>
-        <ul>
-          <li>YouTube: https://www.youtube.com/watch?v=dQw4w9WgXcQ</li>
-          <li>YouTube Short: https://youtu.be/dQw4w9WgXcQ</li>
-        </ul>
-      </div>
     </div>
   );
 };

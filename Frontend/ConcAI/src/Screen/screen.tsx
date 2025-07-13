@@ -19,7 +19,7 @@ const Screen: React.FC<ScreenProps> = ({ videoUrl, selectedSeats, onBack }) => {
         setEmbedUrl(convertedUrl);
         setError('');
       } else {
-        setError('Geçersiz YouTube URL\'si');
+        setError('Invalid YouTube URL');
       }
     }
   }, [videoUrl]);
@@ -52,10 +52,10 @@ const Screen: React.FC<ScreenProps> = ({ videoUrl, selectedSeats, onBack }) => {
     return (
       <div className="screen-container">
         <div className="screen-error">
-          <h3>Hata</h3>
+          <h3>Error</h3>
           <p>{error}</p>
           <button onClick={onBack} className="back-button">
-            Geri Dön
+            Go Back
           </button>
         </div>
       </div>
@@ -65,9 +65,9 @@ const Screen: React.FC<ScreenProps> = ({ videoUrl, selectedSeats, onBack }) => {
   return (
     <div className="screen-container">
       <div className="cinema-header">
-        <h2>🎬 Sinema Keyfi Başlıyor!</h2>
+        <h2>🎬 Cinema Experience Begins!</h2>
         <div className="seat-info">
-          <span>Koltuk(lar): </span>
+          <span>Seat(s): </span>
           {selectedSeats.map((seat, index) => (
             <span key={seat.id} className="seat-number">
               {String.fromCharCode(64 + seat.row)}{seat.number}
@@ -81,7 +81,7 @@ const Screen: React.FC<ScreenProps> = ({ videoUrl, selectedSeats, onBack }) => {
         {isLoading && (
           <div className="screen-loading">
             <div className="loading-spinner"></div>
-            <p>Video hazırlanıyor...</p>
+              <p>Preparing video...</p>
           </div>
         )}
         
@@ -89,7 +89,7 @@ const Screen: React.FC<ScreenProps> = ({ videoUrl, selectedSeats, onBack }) => {
           <div className="video-container">
             <iframe
               src={embedUrl}
-              title="Sinema Videosu"
+              title="Cinema Video"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
               allowFullScreen
@@ -102,7 +102,7 @@ const Screen: React.FC<ScreenProps> = ({ videoUrl, selectedSeats, onBack }) => {
 
       <div className="screen-footer">
         <button onClick={onBack} className="exit-button">
-          Sinemai Bitir
+          End Cinema
         </button>
       </div>
     </div>

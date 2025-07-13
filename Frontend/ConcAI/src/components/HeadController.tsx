@@ -2,15 +2,15 @@ import { useEffect, useRef } from 'react'
 import { useThree, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
-// İnsan kafa hareket limitleri (radyan cinsinden) - sahne merkezinden başlayarak
+// Human head movement limits (in radians) - starting from stage center
 const HEAD_LIMITS = {
-  // Yukarı-aşağı bakma (pitch) limitleri - sahne merkezinden
-  minPitch: -Math.PI / 2.5, // -72 derece (daha fazla aşağı bakma)
-  maxPitch: Math.PI / 3,     // 60 derece (daha fazla yukarı bakma)
+  // Up-down looking (pitch) limits - from stage center
+  minPitch: -Math.PI / 2.5, // -72 degrees (more downward looking)
+  maxPitch: Math.PI / 3,     // 60 degrees (more upward looking)
   
-  // Sağa-sola dönme (yaw) limitleri - sahne merkezinden başlayarak daha geniş
-  minYaw: -Math.PI * 0.75,   // -135 derece (çok daha geniş sol)
-  maxYaw: Math.PI * 0.75,    // 135 derece (çok daha geniş sağ)
+  // Left-right turning (yaw) limits - starting from stage center, wider
+  minYaw: -Math.PI * 0.75,   // -135 degrees (much wider left)
+  maxYaw: Math.PI * 0.75,    // 135 degrees (much wider right)
 }
 
 const MOUSE_SENSITIVITY = 0.002
@@ -25,25 +25,25 @@ const HeadController = ({ viewerPosition = [0, 1.8, 0] }: { viewerPosition?: [nu
   useEffect(() => {
     camera.position.set(viewerPosition[0], viewerPosition[1] + 1.5, viewerPosition[2])
     
-    // Sahne merkezine bakış açısını hesapla (başlangıç rotasyonu)
+    // Calculate viewing angle to stage center (initial rotation)
     const stageCenter = new THREE.Vector3(0, 0, -12)
     const cameraPosition = new THREE.Vector3(viewerPosition[0], viewerPosition[1] + 1.5, viewerPosition[2])
     
-    // Sahne merkezine doğru yönlendirme hesapla
+    // Calculate direction towards stage center
     const direction = new THREE.Vector3().subVectors(stageCenter, cameraPosition).normalize()
     
-    // Y ekseni rotasyonunu (yaw) hesapla - sahne merkezine bakış
+    // Calculate Y-axis rotation (yaw) - looking towards stage center
     const initialYaw = Math.atan2(direction.x, direction.z)
     
-    // X ekseni rotasyonunu (pitch) hesapla - hafif aşağı bakış
+    // Calculate X-axis rotation (pitch) - slight downward look
     const horizontalDistance = Math.sqrt(direction.x * direction.x + direction.z * direction.z)
     const initialPitch = Math.atan2(-direction.y, horizontalDistance)
     
-    // Başlangıç rotasyonunu sahne merkezine ayarla (bu 0 noktası olacak)
+    // Set initial rotation to stage center (this will be the 0 point)
     targetRotation.current = { x: initialPitch, y: initialYaw }
     currentRotation.current = { x: initialPitch, y: initialYaw }
     
-    // Kamerayı hemen sahne merkezine yönlendir
+    // Immediately point camera to stage center
     camera.rotation.order = 'YXZ'
     camera.rotation.x = initialPitch
     camera.rotation.y = initialYaw
@@ -61,16 +61,16 @@ const HeadController = ({ viewerPosition = [0, 1.8, 0] }: { viewerPosition?: [nu
 
       const { movementX, movementY } = event
 
-      // Yaw (sağa-sola dönme) hesapla - sahne merkezinden başlayarak limitlerle kısıtla
+      // Calculate yaw (left-right turning) - constrained by limits starting from stage center
       targetRotation.current.y -= movementX * MOUSE_SENSITIVITY
       
-      // Sahne merkezinden başlayarak geniş açı aralığında clamp
+      // Clamp within wide angle range starting from stage center
       targetRotation.current.y = Math.max(
         HEAD_LIMITS.minYaw,
         Math.min(HEAD_LIMITS.maxYaw, targetRotation.current.y)
       )
 
-      // Pitch (yukarı-aşağı bakma) hesapla - sahne merkezinden başlayarak limitlerle kısıtla
+      // Calculate pitch (up-down looking) - constrained by limits starting from stage center
       targetRotation.current.x -= movementY * MOUSE_SENSITIVITY
       targetRotation.current.x = Math.max(
         HEAD_LIMITS.minPitch,

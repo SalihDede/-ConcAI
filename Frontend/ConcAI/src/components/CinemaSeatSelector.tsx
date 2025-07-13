@@ -47,18 +47,18 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({ seats, onSeatSelect, onClos
         flexDirection: 'column',
         alignItems: 'center',
       }}>
-        <h2 style={{ color: '#FFD700', marginBottom: '20px' }}>Koltuk Seçimi</h2>
+        <h2 style={{ color: '#FFD700', marginBottom: '20px' }}>Seat Selection</h2>
         <svg width="600" height="350" style={{ background: '#181818', borderRadius: '16px', marginBottom: '24px', display: 'block' }}>
-          {/* Sahne */}
+          {/* Stage */}
           <rect x="200" y="30" width="200" height="30" rx="10" fill="#FFD700" stroke="#FFA500" strokeWidth="3" />
-          <text x="300" y="50" textAnchor="middle" fill="#222" fontSize="18" fontWeight="bold">SAHNE</text>
-          {/* Koltuklar */}
+          <text x="300" y="50" textAnchor="middle" fill="#222" fontSize="18" fontWeight="bold">STAGE</text>
+          {/* Seats */}
           {seats.map(seat => {
             // 3D pozisyonları SVG'ye ölçekle, menüde daha önde göstermek için z'ye offset ekle
             const scale = 18;
             const centerX = 300;
             const centerY = 210;
-            const zMenuOffset = -7; // Koltukları menüde daha öne çeker (negatif değer)
+            const zMenuOffset = -7; // Pulls seats forward in the menu (negative value)
             const x = centerX + seat.position.x * scale;
             const y = centerY + (seat.position.z + 12 + zMenuOffset) * scale * 0.6;
             return (
@@ -106,7 +106,7 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({ seats, onSeatSelect, onClos
             boxShadow: selectedSeat ? '0 4px 15px rgba(76, 175, 80, 0.3)' : 'none',
           }}
         >
-          Seçili Koltuğa Geç
+          Go to Selected Seat
         </button>
         <button
           onClick={onClose}
@@ -121,7 +121,7 @@ const SeatSelector: React.FC<SeatSelectorProps> = ({ seats, onSeatSelect, onClos
             cursor: 'pointer',
           }}
         >
-          Kapat
+          Close
         </button>
       </div>
     </div>

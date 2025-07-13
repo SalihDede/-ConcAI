@@ -20,7 +20,7 @@ const Coollesium: React.FC<CoollesiumProps> = ({
 
   useEffect(() => {
     if (isActive && containerRef.current) {
-      // Sahne animasyonlarını başlat
+      // Start scene animations
       containerRef.current.classList.add('scene-active');
     }
   }, [isActive]);
@@ -33,7 +33,7 @@ const Coollesium: React.FC<CoollesiumProps> = ({
         setError('');
         setIsLoading(false);
       } else {
-        setError('Geçersiz YouTube URL\'si');
+        setError('Invalid YouTube URL');
         setIsLoading(false);
       }
     } else {
@@ -67,7 +67,7 @@ const Coollesium: React.FC<CoollesiumProps> = ({
 
   return (
     <div ref={containerRef} className="coollesium-container">
-      {/* Arka Plan Gradient */}
+      {/* Background Gradient */}
       <div className="background-gradient" />
       
       {/* Spotlights */}
@@ -84,13 +84,13 @@ const Coollesium: React.FC<CoollesiumProps> = ({
               {isLoading && videoUrl && (
                 <div className="screen-loading">
                   <div className="loading-spinner"></div>
-                  <p>Video hazırlanıyor...</p>
+                  <p>Preparing video...</p>
                 </div>
               )}
               
               {error && (
                 <div className="screen-error">
-                  <h3>Hata</h3>
+                  <h3>Error</h3>
                   <p>{error}</p>
                 </div>
               )}
@@ -99,7 +99,7 @@ const Coollesium: React.FC<CoollesiumProps> = ({
                 <div className="video-container">
                   <iframe
                     src={embedUrl}
-                    title="Sinema Videosu"
+                    title="Cinema Video"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen
@@ -110,7 +110,7 @@ const Coollesium: React.FC<CoollesiumProps> = ({
               ) : !videoUrl ? (
                 <>
                   <div className="screen-logo">ConcAI</div>
-                  <div className="screen-subtitle">Sinema Deneyimi</div>
+                  <div className="screen-subtitle">Cinema Experience</div>
                 </>
               ) : null}
             </div>
@@ -118,13 +118,13 @@ const Coollesium: React.FC<CoollesiumProps> = ({
         </div>
       </div>
 
-      {/* Sahne Zemini */}
+      {/* Stage Floor */}
       <div className="stage-floor">
         <div className="floor-grid" />
         <div className="floor-reflection" />
       </div>
 
-      {/* Yan Duvarlar */}
+      {/* Side Walls */}
       <div className="side-wall side-wall-left">
         <div className="wall-lighting" />
       </div>

@@ -16,7 +16,7 @@ interface SeatSelectionProps {
 }
 
 const SeatSelection: React.FC<SeatSelectionProps> = ({ seats, onSeatSelect, maxSeats = 6 }) => {
-  // Koltukları satırlara göre grupla
+  // Group seats by rows
   const seatsByRow = seats.reduce((acc, seat) => {
     if (!acc[seat.row]) {
       acc[seat.row] = [];
@@ -31,7 +31,7 @@ const SeatSelection: React.FC<SeatSelectionProps> = ({ seats, onSeatSelect, maxS
     if (!seat.isAvailable) return;
     
     if (!seat.isSelected && selectedSeatsCount >= maxSeats) {
-      alert(`En fazla ${maxSeats} koltuk seçebilirsiniz!`);
+      alert(`You can select maximum ${maxSeats} seats!`);
       return;
     }
     
@@ -41,7 +41,7 @@ const SeatSelection: React.FC<SeatSelectionProps> = ({ seats, onSeatSelect, maxS
   return (
     <div className="seat-selection">
       <div className="screen">
-        <div className="screen-text">PERDE</div>
+        <div className="screen-text">SCREEN</div>
       </div>
       
       <div className="seats-container">
@@ -73,15 +73,15 @@ const SeatSelection: React.FC<SeatSelectionProps> = ({ seats, onSeatSelect, maxS
       <div className="seat-legend">
         <div className="legend-item">
           <div className="seat available small"></div>
-          <span>Müsait</span>
+          <span>Available</span>
         </div>
         <div className="legend-item">
           <div className="seat selected small"></div>
-          <span>Seçili</span>
+          <span>Selected</span>
         </div>
         <div className="legend-item">
           <div className="seat occupied small"></div>
-          <span>Dolu</span>
+          <span>Occupied</span>
         </div>
         <div className="legend-item">
           <div className="seat vip available small"></div>
@@ -90,7 +90,7 @@ const SeatSelection: React.FC<SeatSelectionProps> = ({ seats, onSeatSelect, maxS
       </div>
 
       <div className="selected-seats-info">
-        <p>Seçili Koltuklar: {selectedSeatsCount}/{maxSeats}</p>
+        <p>Selected Seats: {selectedSeatsCount}/{maxSeats}</p>
         <div className="selected-seats-list">
           {seats
             .filter(seat => seat.isSelected)

@@ -20,23 +20,23 @@ interface SceneProps {
   isSeatSelectorOpen?: boolean
 }
 
-// Sinema koltuğu bileşeni
+// Cinema seat component
 const CinemaSeat = ({ position, rotation = [0, 0, 0] }: { position: [number, number, number], rotation?: [number, number, number] }) => {
   return (
     <group position={position} rotation={rotation}>
-      {/* Koltuk oturağı */}
+      {/* Seat base */}
       <mesh position={[0, 0.3, 0]} castShadow>
         <boxGeometry args={[0.7, 0.1, 0.7]} />
         <meshStandardMaterial color="#8B0000" />
       </mesh>
       
-      {/* Koltuk sırtlığı */}
+      {/* Seat backrest */}
       <mesh position={[0, 0.8, -0.3]} castShadow>
         <boxGeometry args={[0.7, 1.0, 0.1]} />
         <meshStandardMaterial color="#8B0000" />
       </mesh>
       
-      {/* Koltuk kolçakları */}
+      {/* Seat armrests */}
       <mesh position={[-0.35, 0.6, 0]} castShadow>
         <boxGeometry args={[0.1, 0.6, 0.6]} />
         <meshStandardMaterial color="#654321" />
@@ -49,23 +49,23 @@ const CinemaSeat = ({ position, rotation = [0, 0, 0] }: { position: [number, num
   )
 }
 
-// Sahne platformu
+// Stage platform
 const Stage = () => {
   return (
     <group position={[0, 0, -12]}>
-      {/* Ana sahne platformu */}
+      {/* Main stage platform */}
       <mesh position={[0, 0.3, 0]} castShadow>
         <boxGeometry args={[16, 0.6, 8]} />
         <meshStandardMaterial color="#2C2C2C" />
       </mesh>
       
-      {/* Sahne arka duvarı */}
+      {/* Stage back wall */}
       <mesh position={[0, 4, -4]} castShadow>
         <boxGeometry args={[16, 8, 0.3]} />
         <meshStandardMaterial color="#1A1A1A" />
       </mesh>
       
-      {/* Sahne yan duvarları */}
+      {/* Stage side walls */}
       <mesh position={[-8, 4, 0]} rotation={[0, Math.PI / 2, 0]} castShadow>
         <boxGeometry args={[8, 8, 0.3]} />
         <meshStandardMaterial color="#1A1A1A" />
@@ -222,17 +222,17 @@ const ProjectionScreenWithVideo = ({ videoUrl, videoTitle, viewerPosition, viewe
   );
 };
 
-// Zemin - daha doğal görünüm için
+// Floor - for more natural appearance
 const Floor = () => {
   return (
     <>
-      {/* Ana zemin */}
+      {/* Main floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
         <circleGeometry args={[25]} />
         <meshStandardMaterial color="#3A3A3A" />
       </mesh>
       
-      {/* Sahne önü zemin */}
+      {/* Stage front floor */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, -8]} receiveShadow>
         <boxGeometry args={[20, 8]} />
         <meshStandardMaterial color="#2F2F2F" />
@@ -241,7 +241,7 @@ const Floor = () => {
   )
 }
 
-// Amfi tiyatro basamakları - sahneyi çevreleyen
+// Amphitheater steps - surrounding the stage
 const AmphitheaterSteps = () => {
   const steps: any[] = []
   const seatsPerRow = [6, 9, 12, 15, 18]
@@ -301,7 +301,7 @@ const Scene = ({ seats, currentViewerSeat, videoUrl, videoTitle, isSeatSelectorO
   const viewerPosition: [number, number, number] = [currentViewerSeat.position.x, currentViewerSeat.position.y + 1.5, currentViewerSeat.position.z];
   return (
     <>
-      {/* Ana sahne ışığı - parlaklık artırıldı */}
+      {/* Main stage light - brightness increased */}
       <spotLight
         position={[0, 15, -8]}
         angle={Math.PI / 6}
@@ -313,7 +313,7 @@ const Scene = ({ seats, currentViewerSeat, videoUrl, videoTitle, isSeatSelectorO
         shadow-mapSize-height={2048}
       />
       
-      {/* Çevresel aydınlatma - parlaklık artırıldı */}
+      {/* Ambient lighting - brightness increased */}
       <directionalLight
         position={[15, 20, 15]}
         intensity={1.0}
@@ -327,17 +327,17 @@ const Scene = ({ seats, currentViewerSeat, videoUrl, videoTitle, isSeatSelectorO
         shadow-camera-bottom={-25}
       />
       
-      {/* Sahne yan ışıkları - parlaklık artırıldı */}
+      {/* Stage side lights - brightness increased */}
       <pointLight position={[-8, 6, -10]} intensity={1.8} color="#FFD700" />
       <pointLight position={[8, 6, -10]} intensity={1.8} color="#FFD700" />
       
-      {/* Tavan ışığı - parlaklık artırıldı */}
+      {/* Ceiling light - brightness increased */}
       <pointLight position={[0, 12, 0]} intensity={1.2} color="#FFFFFF" />
       
-      {/* Genel ortam ışığı eklendi */}
+      {/* General ambient light added */}
       <ambientLight intensity={0.4} color="#FFFFFF" />
 
-      {/* Zemin ve yapılar */}
+      {/* Floor and structures */}
       <Floor />
       <AmphitheaterSteps />
       <ColosseumWalls />
@@ -346,7 +346,7 @@ const Scene = ({ seats, currentViewerSeat, videoUrl, videoTitle, isSeatSelectorO
       {/* Video oynatma ekranı */}
       <ProjectionScreenWithVideo videoUrl={videoUrl} videoTitle={videoTitle} viewerPosition={viewerPosition} viewerRotationY={viewerRotationY} isSeatSelectorOpen={!!isSeatSelectorOpen} />
 
-      {/* Amfi tiyatro koltukları */}
+      {/* Amphitheater seats */}
       {seats.map((seat, index) => {
         if (seat.row === currentViewerSeat.row && seat.seatNumber === currentViewerSeat.seatNumber) {
           return null
@@ -361,7 +361,7 @@ const Scene = ({ seats, currentViewerSeat, videoUrl, videoTitle, isSeatSelectorO
         )
       })}
       
-      {/* Kafa hareket kontrolcüsü */}
+      {/* Head movement controller */}
       <HeadController viewerPosition={[currentViewerSeat.position.x, currentViewerSeat.position.y + 1.5, currentViewerSeat.position.z]} />
     </>
   )
