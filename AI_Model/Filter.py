@@ -1,68 +1,45 @@
-import os
+from ultralytics import YOLO
+import cv2, numpy as np
 from pathlib import Path
 
-import cv2
-import numpy as np
-import torch
-from ultralytics import YOLO
+# 0) Path’ler
+script_dir = Path(__file__).parent.resolve()
+frames_dir = script_dir / "Data" / "frames"
+runs_dir   = script_dir.parent / "runs"
+seg_model  = "yolov8n-seg.pt"
 
-# 0) Path’leri tanımla
-script_dir = Path(__file__).parent.resolve()   # script’in olduğu klasör
-root_dir   = script_dir.parent                 # bir üst dizin (runs burada)
-frames_dir = script_dir / "Data" / "frames"    # Data/frames
-runs_dir   = root_dir / "runs"                 # proje kökündeki runs
+# 1) Modeli yükle
+model = YOLO(seg_model)
 
-# 1) CUDA ayarı
-device = 0 if torch.cuda.is_available() else 'cpu'
-print(f"Using device: {device}")
+# 2) Çıktı dizini
+out_dir = runs_dir / "segmented"
+out_dir.mkdir(exist_ok=True, parents=True)
 
-# 2) Ağırlık dosyasını bul
-exp_dir = runs_dir / "detect" / "person-detect-cuda3"
-wdir    = exp_dir / "weights"
-# best.pt veya last.pt kontrolü
-if   (wdir / "best.pt").exists(): weight_file = wdir / "best.pt"
-elif (wdir / "last.pt").exists(): weight_file = wdir / "last.pt"
-else: raise FileNotFoundError(f"No .pt in {wdir}")
-print("Loading weights from", weight_file)
-
-# 3) Modeli yükle
-model = YOLO(str(weight_file))
-
-# 4) Çıktı dizinini oluştur
-filtered_dir = runs_dir / "filtered"
-filtered_dir.mkdir(parents=True, exist_ok=True)
-
-# 5) Frame’leri işle
+# 3) Frame’leri işle
 for img_path in sorted(frames_dir.iterdir()):
-    if img_path.suffix.lower() not in [".jpg", ".png", ".bmp"]:
+    if img_path.suffix.lower() not in [".jpg", ".png"]:
         continue
 
     img = cv2.imread(str(img_path))
     h, w = img.shape[:2]
 
-    # tespit
-    results = model.predict(
-        source=str(img_path),
-        device=device,
-        imgsz=512,
-        conf=0.25,
-        save=False
-    )
-    boxes = results[0].boxes.xyxy.cpu().numpy()
+    # inference
+    results = model.predict(source=str(img_path), device=0, imgsz=512, conf=0.25)
+    masks   = results[0].masks.data.cpu().numpy()   # shape: (N, H', W')
 
-    # maske
-    mask = np.zeros((h, w), dtype=np.uint8)
-    for x1, y1, x2, y2 in boxes:
-        x1, y1, x2, y2 = map(int, (x1, y1, x2, y2))
-        mask[y1:y2, x1:x2] = 255
+    # tüm insan maskelerini 1/0 olarak birleştir
+    full_mask = np.zeros((h, w), dtype=np.uint8)
+    for m in masks:
+        m_resized = cv2.resize(m, (w, h), interpolation=cv2.INTER_LINEAR)
+        human_px  = (m_resized > 0.5).astype(np.uint8)
+        full_mask = np.maximum(full_mask, human_px)
 
-    # filtrelenmiş görüntü
-    mask3    = cv2.merge([mask, mask, mask])
-    filtered = cv2.bitwise_and(img, mask3)
+    # broadcast ile 3 kanala çıkar ve direkt çarp
+    mask3     = np.stack([full_mask]*3, axis=-1)
+    segmented = img * mask3     # = 0 veya orijinal piksel değerleri
 
-    # kaydet
-    out_path = filtered_dir / img_path.name
-    cv2.imwrite(str(out_path), filtered)
-    print("Saved", out_path)
+    # *255 kaldırıldı!
+    cv2.imwrite(str(out_dir / img_path.name), segmented)
+    print("Saved:", img_path.name)
 
-print("İşlem tamamlandı. Çıktılar:", filtered_dir)
+print("Segmentasyon tamamlandı:", out_dir)
